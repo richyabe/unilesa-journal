@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 560" width="400" height="560">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0B2D5B"/>
+      <stop offset="100%" stop-color="#1E5AA8"/>
+    </linearGradient>
+    <linearGradient id="wave1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#A7D8F0" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#4A90D9" stop-opacity="0.3"/>
+    </linearGradient>
+    <linearGradient id="wave2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#138A36" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#1DAA44" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="560" fill="url(#bg)"/>
+
+  <!-- Wave 1 (light blue) -->
+  <path d="M0,220 C80,180 160,260 240,220 C320,180 370,230 400,210 L400,560 L0,560 Z" fill="url(#wave1)"/>
+
+  <!-- Wave 2 (green tint) -->
+  <path d="M0,300 C100,260 200,340 300,300 C350,280 380,310 400,295 L400,560 L0,560 Z" fill="url(#wave2)"/>
+
+  <!-- Dark navy base wave -->
+  <path d="M0,360 C120,330 250,390 400,350 L400,560 L0,560 Z" fill="#0B2D5B" opacity="0.6"/>
+
+  <!-- Top white bar for header text -->
+  <rect x="0" y="0" width="400" height="130" fill="white" opacity="0.97"/>
+
+  <!-- Header: Logo circle placeholder -->
+  <circle cx="44" cy="65" r="30" fill="#0B2D5B"/>
+  <text x="44" y="70" font-family="serif" font-size="12" fill="white" text-anchor="middle" font-weight="bold">UJSMS</text>
+
+  <!-- Header: Journal name -->
+  <text x="84" y="50" font-family="serif" font-size="13" fill="#0B2D5B" font-weight="bold">UNILESA JOURNAL of</text>
+  <text x="84" y="67" font-family="serif" font-size="13" fill="#0B2D5B" font-weight="bold">SOCIAL AND MANAGEMENT</text>
+  <text x="84" y="84" font-family="serif" font-size="13" fill="#0B2D5B" font-weight="bold">SCIENCES</text>
+
+  <!-- Tagline -->
+  <text x="84" y="102" font-family="sans-serif" font-size="7.5" fill="#4A5568">UJSMS advances interdisciplinary research in social and management</text>
+  <text x="84" y="113" font-family="sans-serif" font-size="7.5" fill="#4A5568">sciences, fostering innovation, academic excellence, and</text>
+  <text x="84" y="124" font-family="sans-serif" font-size="7.5" fill="#4A5568">impactful scholarship in Nigeria and beyond.</text>
+
+  <!-- Centre seal circle -->
+  <circle cx="160" cy="310" r="90" fill="white" opacity="0.1"/>
+  <circle cx="160" cy="310" r="86" fill="none" stroke="white" stroke-width="1.5" opacity="0.3"/>
+  <circle cx="160" cy="310" r="70" fill="white" opacity="0.08"/>
+
+  <!-- Seal text arc (top) -->
+  <path id="arcTop" d="M 80,310 A 80,80 0 0,1 240,310" fill="none"/>
+  <text font-family="sans-serif" font-size="9" fill="white" opacity="0.8" letter-spacing="2">
+    <textPath href="#arcTop" startOffset="5%">UNIVERSITY OF ILESA</textPath>
+  </text>
+
+  <!-- UJSMS text in seal -->
+  <text x="160" y="305" font-family="serif" font-size="18" fill="white" text-anchor="middle" font-weight="bold" opacity="0.9">UJSMS</text>
+
+  <!-- Shield/emblem placeholder -->
+  <rect x="138" y="310" width="44" height="36" rx="4" fill="#1E5AA8" opacity="0.6"/>
+  <path d="M146,330 L154,322 L162,330 L160,338 L152,342 L144,338 Z" fill="#B5924C" opacity="0.8"/>
+  <rect x="138" y="338" width="44" height="8" rx="2" fill="#138A36" opacity="0.7"/>
+
+  <!-- Date bottom right -->
+  <text x="360" y="440" font-family="serif" font-size="22" fill="white" text-anchor="end" font-weight="bold">JULY,  2026</text>
+
+  <!-- Bottom bar -->
+  <rect x="0" y="510" width="400" height="50" fill="transparent"/>
+  <text x="20" y="532" font-family="sans-serif" font-size="9" fill="rgba(255,255,255,0.6)">Vol. 1  Issue 1  July 2026</text>
+  <text x="200" y="532" font-family="sans-serif" font-size="9" fill="rgba(255,255,255,0.7)" text-anchor="middle">www.ujsms.com</text>
+
+  <!-- Social icons (simple circles) -->
+  <circle cx="330" cy="528" r="8" fill="rgba(255,255,255,0.15)"/>
+  <text x="330" y="532" font-family="sans-serif" font-size="8" fill="white" text-anchor="middle">f</text>
+  <circle cx="350" cy="528" r="8" fill="rgba(255,255,255,0.15)"/>
+  <text x="350" y="532" font-family="sans-serif" font-size="7" fill="white" text-anchor="middle">𝕏</text>
+  <circle cx="370" cy="528" r="8" fill="rgba(255,255,255,0.15)"/>
+  <text x="370" y="533" font-family="sans-serif" font-size="9" fill="white" text-anchor="middle">○</text>
+</svg>

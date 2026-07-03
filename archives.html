@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Archives — UJSMS</title>
+  <meta name="description" content="Browse all published volumes and issues of the UNILESA Journal of Social and Management Sciences.">
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <style>
+    .volume-section { margin-bottom: 48px; }
+    .volume-heading {
+      display: flex; align-items: center; gap: 16px;
+      padding: 20px 28px;
+      background: var(--navy);
+      color: #fff;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      font-family: 'Playfair Display', serif;
+      font-size: var(--fs-xl);
+    }
+    .volume-body {
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      overflow: hidden;
+    }
+    .issue-row {
+      display: grid;
+      grid-template-columns: 120px 1fr auto;
+      align-items: center;
+      gap: 24px;
+      padding: 20px 28px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-card);
+      transition: background var(--dur) var(--ease);
+    }
+    .issue-row:last-child { border-bottom: none; }
+    .issue-row:hover { background: var(--bg-alt); }
+    .issue-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: var(--fs-sm);
+      font-weight: 600;
+      color: var(--royal);
+      background: rgba(30,90,168,.08);
+      padding: 6px 14px;
+      border-radius: 100px;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .issue-info-title { font-weight: 600; margin-bottom: 4px; }
+    .issue-info-meta  { font-size: var(--fs-xs); color: var(--text-muted); }
+    .issue-actions    { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+    @media(max-width:640px){
+      .issue-row { grid-template-columns: 1fr; gap:12px; }
+      .issue-actions { justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="navPlaceholder"></div>
+
+<section class="page-banner">
+  <div class="container page-banner-content">
+    <div class="page-banner-breadcrumb">
+      <a href="index.html">Home</a><span>/</span><span>Archives</span>
+    </div>
+    <h1 class="page-banner-title">Archives</h1>
+    <p class="page-banner-sub">Browse all published volumes and issues of UJSMS.</p>
+  </div>
+</section>
+
+<main>
+<section class="section">
+  <div class="container">
+
+    <!-- Search & filter row -->
+    <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:40px" data-reveal>
+      <div class="search-bar" style="flex:1;min-width:240px;max-width:480px">
+        <input type="search" id="archiveSearch" placeholder="Search by title, author, or keyword…" aria-label="Search archives">
+        <button onclick="doArchiveSearch()">Search</button>
+      </div>
+      <select class="form-select" id="yearFilter" style="width:auto" onchange="filterArchives()">
+        <option value="">All Years</option>
+        <option value="2026">2026</option>
+      </select>
+      <select class="form-select" id="catFilter" style="width:auto" onchange="filterArchives()">
+        <option value="">All Categories</option>
+        <option>Management Sciences</option>
+        <option>Social Sciences</option>
+        <option>Economics</option>
+        <option>Public Administration</option>
+        <option>Entrepreneurship</option>
+        <option>Human Resources</option>
+      </select>
+    </div>
+
+    <!-- Results count -->
+    <p id="resultsCount" style="font-size:var(--fs-sm);color:var(--text-muted);margin-bottom:24px"></p>
+
+    <!-- Archives list -->
+    <div id="archivesList">
+      <div class="loading-state"><div class="loader"></div><span>Loading archives…</span></div>
+    </div>
+
+    <!-- Article search results (shown when search is active) -->
+    <div id="articleResults" style="display:none">
+      <div class="section-header" style="margin-bottom:32px;margin-top:48px">
+        <div class="section-eyebrow">Search Results</div>
+        <h2 class="section-title">Matching Articles</h2>
+      </div>
+      <div class="grid-3" id="articleResultsGrid"></div>
+    </div>
+
+  </div>
+</section>
+</main>
+
+<div id="footerPlaceholder"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="assets/js/supabase.js"></script>
+<script src="assets/js/components.js"></script>
+<script>
+let allIssues = [];
+let allArticlesCache = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    allIssues = await fetchIssues();
+    if (!allIssues.length) allIssues = getFallbackIssues();
+  } catch(e) {
+    allIssues = getFallbackIssues();
+  }
+  try {
+    allArticlesCache = await fetchArticles({ limit: 200 });
+    if (!allArticlesCache.length) allArticlesCache = getFallbackArticles();
+  } catch(e) {
+    allArticlesCache = getFallbackArticles();
+  }
+  renderArchives(allIssues);
+  initReveal();
+});
+
+function renderArchives(issues) {
+  const container = document.getElementById('archivesList');
+  if (!issues.length) { showEmpty(container, 'No issues published yet', '📚'); return; }
+
+  // Group by volume
+  const volumes = {};
+  issues.forEach(issue => {
+    const v = issue.volume || 1;
+    if (!volumes[v]) volumes[v] = [];
+    volumes[v].push(issue);
+  });
+
+  const count = issues.reduce((sum, v) => sum + (v.article_count || 0), 0);
+  document.getElementById('resultsCount').textContent = `${issues.length} issue${issues.length !== 1 ? 's' : ''} · ${count} articles`;
+
+  container.innerHTML = Object.keys(volumes).sort((a,b) => b-a).map(vol => {
+    const iss = volumes[vol].sort((a,b) => b.issue_number - a.issue_number);
+    return `
+      <div class="volume-section" data-reveal>
+        <div class="volume-heading">
+          <span>📚</span>
+          <span>Volume ${vol}</span>
+          <span style="font-size:var(--fs-sm);font-family:'Inter',sans-serif;font-weight:400;opacity:.7;margin-left:auto">${iss.length} issue${iss.length !== 1 ? 's' : ''}</span>
+        </div>
+        <div class="volume-body">
+          ${iss.map(i => renderIssueRow(i)).join('')}
+        </div>
+      </div>`;
+  }).join('');
+  initReveal();
+}
+
+function renderIssueRow(issue) {
+  const date = issue.published_date ? formatDateShort(issue.published_date) : 'July 2026';
+  const coverUrl = issue.cover_url ? storageUrl('covers', issue.cover_url) : null;
+  const pdfUrl   = issue.pdf_url   ? storageUrl('issues', issue.pdf_url)   : null;
+  return `
+    <div class="issue-row">
+      <div class="issue-num">Issue ${issue.issue_number || 1}</div>
+      <div>
+        <div class="issue-info-title">${issue.title || `Vol. ${issue.volume}, Issue ${issue.issue_number}`}</div>
+        <div class="issue-info-meta">📅 ${date} · 📄 ${issue.article_count || '—'} articles</div>
+      </div>
+      <div class="issue-actions">
+        <a href="current-issue.html?issue=${issue.id}" class="btn btn-outline btn-sm">View Issue</a>
+        ${pdfUrl ? `<a href="${pdfUrl}" target="_blank" class="btn btn-primary btn-sm">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF
+        </a>` : ''}
+      </div>
+    </div>`;
+}
+
+function doArchiveSearch() {
+  const q = document.getElementById('archiveSearch').value.toLowerCase().trim();
+  if (!q) {
+    document.getElementById('articleResults').style.display = 'none';
+    renderArchives(allIssues);
+    return;
+  }
+  // Search articles
+  const matches = allArticlesCache.filter(a =>
+    a.title?.toLowerCase().includes(q) ||
+    (Array.isArray(a.authors) ? a.authors.join(' ') : a.authors || '').toLowerCase().includes(q) ||
+    a.abstract?.toLowerCase().includes(q) ||
+    a.category?.toLowerCase().includes(q)
+  );
+  document.getElementById('articleResults').style.display = 'block';
+  const grid = document.getElementById('articleResultsGrid');
+  if (!matches.length) {
+    showEmpty(grid, 'No articles matched your search', '🔍');
+  } else {
+    grid.innerHTML = matches.map(a => renderArticleCardSmall(a)).join('');
+    document.getElementById('resultsCount').textContent = `${matches.length} article${matches.length !== 1 ? 's' : ''} found`;
+  }
+  initReveal();
+}
+
+function filterArchives() {
+  const year = document.getElementById('yearFilter').value;
+  const cat  = document.getElementById('catFilter').value;
+  let filtered = allIssues;
+  if (year) filtered = filtered.filter(i => i.published_date?.startsWith(year));
+  renderArchives(filtered);
+
+  // Also filter articles if cat selected
+  if (cat) {
+    const matches = allArticlesCache.filter(a => a.category === cat);
+    document.getElementById('articleResults').style.display = 'block';
+    const grid = document.getElementById('articleResultsGrid');
+    grid.innerHTML = matches.length
+      ? matches.map(a => renderArticleCardSmall(a)).join('')
+      : '<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-title">No articles in this category yet</div></div>';
+    initReveal();
+  } else {
+    document.getElementById('articleResults').style.display = 'none';
+  }
+}
+
+document.getElementById('archiveSearch')?.addEventListener('keydown', e => { if(e.key==='Enter') doArchiveSearch(); });
+
+function renderArticleCardSmall(a) {
+  const authors = Array.isArray(a.authors) ? a.authors.join(', ') : (a.authors || '');
+  const date = formatDate ? formatDate(a.created_at) : '';
+  const abs = truncate ? truncate(a.abstract || '', 140) : '';
+  const pdfUrl = a.pdf_url ? storageUrl('pdfs', a.pdf_url) : null;
+  return `
+    <div class="card article-card" data-reveal>
+      <div class="article-card-body">
+        <div class="card-meta">
+          <span class="tag tag-blue">${a.category || 'Article'}</span>
+          <span style="font-size:var(--fs-xs);color:var(--text-muted)">${date}</span>
+        </div>
+        <h3 class="article-card-title">${a.title}</h3>
+        <p class="article-card-authors">${authors}</p>
+        <p class="article-card-abstract">${abs}</p>
+      </div>
+      <div class="article-card-footer">
+        <a href="article.html?id=${a.id}" class="btn btn-outline btn-sm">Read</a>
+        ${pdfUrl ? `<a href="${pdfUrl}" target="_blank" class="btn btn-primary btn-sm">PDF</a>` : ''}
+      </div>
+    </div>`;
+}
+
+function getFallbackIssues() {
+  return [
+    { id:'1', volume:1, issue_number:1, title:'Inaugural Edition — Social Dynamics and Economic Governance', published_date:'2026-07-01', article_count:8, cover_url:null, pdf_url:null },
+  ];
+}
+
+function getFallbackArticles() {
+  return [
+    { id:'1', title:'Corporate Governance and Financial Performance in Nigerian Banking Sector', authors:['Dr. Adewale Okafor'], abstract:'This study examines the relationship between corporate governance mechanisms and the financial performance of deposit money banks.', category:'Management Sciences', created_at: new Date().toISOString() },
+    { id:'2', title:'Social Capital and Community Development in Urban Lagos', authors:['Dr. Chioma Nwosu'], abstract:'An empirical investigation into how social capital formation affects community-driven development initiatives.', category:'Social Sciences', created_at: new Date().toISOString() },
+    { id:'3', title:'Entrepreneurial Orientation and SME Growth in Sub-Saharan Africa', authors:['Prof. Emeka Obi'], abstract:'This paper explores how entrepreneurial orientation dimensions predict the growth trajectories of SMEs.', category:'Entrepreneurship', created_at: new Date().toISOString() },
+    { id:'4', title:'Digital Transformation in Public Sector Management', authors:['Dr. Kemi Adebayo'], abstract:'A systematic review of digital transformation initiatives in Nigeria\'s public sector.', category:'Public Administration', created_at: new Date().toISOString() },
+    { id:'5', title:'Microfinance and Poverty Alleviation: Evidence from Rural Nigeria', authors:['Dr. Aminu Bello'], abstract:'This study evaluates the effectiveness of microfinance institution interventions on poverty alleviation.', category:'Economics', created_at: new Date().toISOString() },
+    { id:'6', title:'Organizational Culture and Employee Retention in Nigerian Universities', authors:['Dr. Taiwo Ogundele'], abstract:'Examining how organizational culture dimensions predict employee retention outcomes.', category:'Human Resources', created_at: new Date().toISOString() },
+  ];
+}
+</script>
+</body>
+</html>

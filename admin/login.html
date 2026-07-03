@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login — UJSMS</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" href="../assets/images/logo.png">
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--navy) 0%, #0F3A72 50%, var(--royal) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    body::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 70% at 80% 20%, rgba(74,144,217,.2) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 60% at 20% 80%, rgba(19,138,54,.15) 0%, transparent 60%);
+    }
+    .login-card {
+      position: relative; z-index: 1;
+      background: var(--bg-card);
+      border-radius: var(--radius-xl);
+      padding: 56px 48px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: var(--shadow-xl);
+    }
+    .login-logo {
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 12px; margin-bottom: 36px; text-align: center;
+    }
+    .login-logo img {
+      width: 72px; height: 72px; border-radius: 50%;
+      border: 3px solid var(--border);
+    }
+    .login-title { font-size: var(--fs-2xl); margin-bottom: 4px; }
+    .login-sub   { font-size: var(--fs-sm); color: var(--text-muted); }
+    .divider { display: flex; align-items: center; gap: 12px; margin: 8px 0 24px; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .divider span { font-size: var(--fs-xs); color: var(--text-muted); }
+    .login-footer { text-align: center; margin-top: 24px; }
+    .login-footer a { font-size: var(--fs-sm); color: var(--royal); }
+    .eye-btn {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 16px;
+    }
+    .input-wrap { position: relative; }
+    @media(max-width:480px) {
+      .login-card { padding: 36px 24px; margin: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Theme toggle (top right) -->
+<button class="theme-toggle" onclick="toggleTheme()" style="position:fixed;top:20px;right:20px;z-index:10" id="themeToggle" aria-label="Toggle theme">🌙</button>
+
+<div class="login-card">
+  <div class="login-logo">
+    <img src="../assets/images/logo.png" alt="UJSMS Logo" onerror="this.style.display='none'">
+    <div>
+      <div class="login-title">Admin Portal</div>
+      <div class="login-sub">UNILESA Journal of Social and Management Sciences</div>
+    </div>
+  </div>
+
+  <div id="loginAlert"></div>
+
+  <form id="loginForm" novalidate>
+    <div class="form-group">
+      <label class="form-label" for="adminEmail">Email Address</label>
+      <input class="form-input" id="adminEmail" type="email" placeholder="admin@ujsms.com" autocomplete="username" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="adminPassword">Password</label>
+      <div class="input-wrap">
+        <input class="form-input" id="adminPassword" type="password" placeholder="••••••••" autocomplete="current-password" required style="padding-right:44px">
+        <button type="button" class="eye-btn" id="eyeBtn" onclick="togglePwd()" aria-label="Toggle password visibility">👁</button>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;font-size:var(--fs-sm)">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <input type="checkbox" id="rememberMe" style="accent-color:var(--royal)"> Remember me
+      </label>
+      <a href="mailto:editor@ujsms.com?subject=Admin Password Reset" style="color:var(--royal)">Forgot password?</a>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-lg" style="width:100%;justify-content:center" id="loginBtn">
+      Sign In to Dashboard
+    </button>
+  </form>
+
+  <div class="divider"><span>UJSMS Admin · Authorised Personnel Only</span></div>
+
+  <div class="login-footer">
+    <a href="../index.html">← Return to Public Website</a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="../assets/js/supabase.js"></script>
+<script>
+// Init theme
+(function() {
+  const t = localStorage.getItem('ujsms-theme') || 'light';
+  document.documentElement.setAttribute('data-theme', t);
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.textContent = t === 'dark' ? '☀️' : '🌙';
+})();
+
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('ujsms-theme', next);
+  document.getElementById('themeToggle').textContent = next === 'dark' ? '☀️' : '🌙';
+}
+
+function togglePwd() {
+  const inp = document.getElementById('adminPassword');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+// Redirect if already logged in
+(async () => {
+  try {
+    const session = await getSession();
+    if (session) location.href = 'dashboard.html';
+  } catch(e) {}
+})();
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn   = document.getElementById('loginBtn');
+  const alert = document.getElementById('loginAlert');
+  const email = document.getElementById('adminEmail').value.trim();
+  const pwd   = document.getElementById('adminPassword').value;
+
+  if (!email || !pwd) {
+    showAlert(alert, 'Please enter your email and password.', 'error'); return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="loader" style="border-top-color:#fff;width:16px;height:16px"></div> Signing in…';
+
+  try {
+    await signIn(email, pwd);
+    location.href = 'dashboard.html';
+  } catch(err) {
+    let msg = 'Invalid email or password. Please try again.';
+    if (err.message?.includes('not configured')) {
+      msg = 'Supabase is not yet configured. Please set up your SUPABASE_URL and SUPABASE_ANON environment variables.';
+    }
+    showAlert(alert, msg, 'error');
+    btn.disabled = false;
+    btn.innerHTML = 'Sign In to Dashboard';
+  }
+});
+
+function showAlert(container, msg, type) {
+  container.innerHTML = `<div class="alert alert-${type}" style="margin-bottom:16px">${msg}</div>`;
+}
+</script>
+</body>
+</html>
