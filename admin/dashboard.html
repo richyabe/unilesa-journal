@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — UJSMS</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" href="../assets/images/logo.png">
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+
+<!-- Sidebar overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="admin-sidebar" id="adminSidebar" aria-label="Admin navigation">
+  <a href="../index.html" class="sidebar-brand">
+    <img src="../assets/images/logo.png" alt="UJSMS" onerror="this.style.display='none'">
+    <div class="sidebar-brand-text">
+      <div class="sidebar-brand-name">UJSMS Admin</div>
+      <div class="sidebar-brand-sub">Dashboard</div>
+    </div>
+  </a>
+
+  <nav class="sidebar-nav">
+    <div class="sidebar-section-label">Overview</div>
+    <button class="sidebar-link active" onclick="showSection('dashboard')" data-section="dashboard">
+      <span class="sidebar-link-icon">📊</span> Dashboard
+    </button>
+
+    <div class="sidebar-section-label">Content</div>
+    <button class="sidebar-link" onclick="showSection('articles')" data-section="articles">
+      <span class="sidebar-link-icon">📄</span> Articles
+      <span class="sidebar-badge" id="articlesBadge">—</span>
+    </button>
+    <button class="sidebar-link" onclick="showSection('issues')" data-section="issues">
+      <span class="sidebar-link-icon">📚</span> Journal Issues
+    </button>
+    <button class="sidebar-link" onclick="showSection('announcements')" data-section="announcements">
+      <span class="sidebar-link-icon">📢</span> Announcements
+    </button>
+
+    <div class="sidebar-section-label">Community</div>
+    <button class="sidebar-link" onclick="showSection('comments')" data-section="comments">
+      <span class="sidebar-link-icon">💬</span> Comments
+      <span class="sidebar-badge" id="commentsBadge">—</span>
+    </button>
+
+    <div class="sidebar-section-label">People</div>
+    <button class="sidebar-link" onclick="showSection('board')" data-section="board">
+      <span class="sidebar-link-icon">👥</span> Editorial Board
+    </button>
+
+    <div class="sidebar-section-label">Settings</div>
+    <button class="sidebar-link" onclick="showSection('settings')" data-section="settings">
+      <span class="sidebar-link-icon">⚙️</span> Settings
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="sidebar-link" onclick="handleSignOut()" style="color:rgba(255,100,100,.8)">
+      <span class="sidebar-link-icon">🚪</span> Sign Out
+    </button>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<div class="admin-main">
+
+  <!-- Top bar -->
+  <header class="admin-topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="Toggle sidebar">☰</button>
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle theme">🌙</button>
+      <a href="../index.html" target="_blank" class="btn btn-outline btn-sm">View Site →</a>
+      <div class="user-chip" id="userChip">
+        <div class="user-avatar-sm" id="userAvatar">A</div>
+        <span id="userEmail" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Admin</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <div class="admin-content">
+
+    <!-- ──────────────────────────────────────────
+         DASHBOARD SECTION
+    ────────────────────────────────────────── -->
+    <div id="section-dashboard">
+      <div id="globalAlert"></div>
+
+      <!-- Stat cards -->
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="stat-card-icon blue">📄</div>
+          <div>
+            <div class="stat-card-value" id="statArticles">—</div>
+            <div class="stat-card-label">Total Articles</div>
+            <div class="stat-card-change">↑ Published this month</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon green">📚</div>
+          <div>
+            <div class="stat-card-value" id="statIssues">—</div>
+            <div class="stat-card-label">Issues Published</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon gold">💬</div>
+          <div>
+            <div class="stat-card-value" id="statComments">—</div>
+            <div class="stat-card-label">Pending Comments</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon navy">📢</div>
+          <div>
+            <div class="stat-card-value" id="statAnnouncements">—</div>
+            <div class="stat-card-label">Active Announcements</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent articles + pending comments side by side -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+        <div class="admin-panel">
+          <div class="panel-header">
+            <div class="panel-title">Recent Articles</div>
+            <button class="btn btn-primary btn-sm" onclick="showSection('articles');openModal('articleModal')">+ New Article</button>
+          </div>
+          <div id="dashRecentArticles"><div class="loading-state"><div class="loader"></div></div></div>
+        </div>
+        <div class="admin-panel">
+          <div class="panel-header">
+            <div class="panel-title">Pending Comments</div>
+            <button class="btn btn-outline btn-sm" onclick="showSection('comments')">View All</button>
+          </div>
+          <div id="dashPendingComments"><div class="loading-state"><div class="loader"></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────────────────────────────────────────
+         ARTICLES SECTION
+    ────────────────────────────────────────── -->
+    <div id="section-articles" style="display:none">
+      <div class="admin-panel">
+        <div class="panel-header">
+          <div class="panel-title">Articles</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <div class="search-bar" style="max-width:240px">
+              <input type="search" id="articleSearchAdmin" placeholder="Search articles…" oninput="filterAdminArticles()">
+              <button>🔍</button>
+            </div>
+            <select class="form-select" id="articleStatusFilter" onchange="filterAdminArticles()" style="width:auto">
+              <option value="">All Status</option>
+              <option value="true">Published</option>
+              <option value="false">Draft</option>
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="openModal('articleModal');resetArticleForm()">+ Add Article</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Title</th><th>Authors</th><th>Category</th><th>Issue</th><th>Status</th><th>Date</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="articlesTableBody">
+              <tr><td colspan="7" class="loading-state"><div class="loader"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────────────────────────────────────────
+         ISSUES SECTION
+    ────────────────────────────────────────── -->
+    <div id="section-issues" style="display:none">
+      <div class="admin-panel">
+        <div class="panel-header">
+          <div class="panel-title">Journal Issues</div>
+          <button class="btn btn-primary btn-sm" onclick="openModal('issueModal');resetIssueForm()">+ New Issue</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="admin-table">
+            <thead>
+              <tr><th>Volume</th><th>Issue</th><th>Title</th><th>Published Date</th><th>Articles</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="issuesTableBody">
+              <tr><td colspan="7" class="loading-state"><div class="loader"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────────────────────────────────────────
+         ANNOUNCEMENTS SECTION
+    ────────────────────────────────────────── -->
+    <div id="section-announcements" style="display:none">
+      <div class="admin-panel">
+        <div class="panel-header">
+          <div class="panel-title">Announcements</div>
+          <button class="btn btn-primary btn-sm" onclick="openModal('announcementModal');resetAnnForm()">+ New Announcement</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="admin-table">
+            <thead>
+              <tr><th>Title</th><th>Type</th><th>Active</th><th>Date</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="announcementsTableBody">
+              <tr><td colspan="5" class="loading-state"><div class="loader"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────────────────────────────────────────
+         COMMENTS SECTION
+    ────────────────────────────────────────── -->
+    <div id="section-comments" style="display:none">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
+        <div class="stat-card">
+          <div class="stat-card-icon gold">⏳</div>
+          <div><div class="stat-card-value" id="cPending">—</div><div class="stat-card-label">Pending Approval</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon green">✅</div>
+          <div><div class="stat-card-value" id="cApproved">—</div><div class="stat-card-label">Approved</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon navy">📌</div>
+          <div><div class="stat-card-value" id="cPinned">—</div><div class="stat-card-label">Pinned</div></div>
+        </div>
+      </div>
+      <div class="admin-panel">
+        <div class="panel-header">
+          <div class="panel-title">Comment Moderation</div>
+          <div style="display:flex;gap:8px">
+            <select class="form-select" id="commentFilter" onchange="loadCommentsMod()" style="width:auto">
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="all">All</option>
+            </select>
+          </div>
+        </div>
+        <div class="panel-body" id="commentsModList">
+          <div class="loading-state"><div class="loader"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────────────────────────────────────────
+         EDITORIAL BOARD SECTION
+    ────────────────────────────────────────── -->
+    <div id="section-board" style="display:none">
+      <div class="admin-panel">
+        <div class="panel-header">
+          <div class="panel-title">Editorial Board Members</div>
+          <button class="btn btn-primary btn-sm" onclick="openModal('boardModal');resetBoardForm()">+ Add Member</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="admin-table">
+            <thead>
+              <tr><th>Name</th><th>Role</th><th>Specialization</th><th>Institution</th><th>Active</th><th>Sort</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="boardTableBody">
+              <tr><td colspan="7" class="loading-state"><div class="loader"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────────────────────────────────────────
+         SETTINGS SECTION
+    ────────────────────────────────────────── -->
+    <div id="section-settings" style="display:none">
+      <div class="grid-2" style="gap:24px">
+        <div class="admin-panel">
+          <div class="panel-header"><div class="panel-title">Account Settings</div></div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label class="form-label">Display Name</label>
+              <input class="form-input" id="settingName" placeholder="e.g. Prof. T. J. Ayoola">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input class="form-input" id="settingEmail" type="email" disabled style="opacity:.6">
+            </div>
+            <div class="form-group">
+              <label class="form-label">New Password</label>
+              <input class="form-input" id="settingPassword" type="password" placeholder="Leave blank to keep current">
+            </div>
+            <button class="btn btn-primary" onclick="saveAccountSettings()">Save Changes</button>
+          </div>
+        </div>
+        <div class="admin-panel">
+          <div class="panel-header"><div class="panel-title">Journal Settings</div></div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label class="form-label">Journal Name</label>
+              <input class="form-input" value="UNILESA Journal of Social and Management Sciences" disabled style="opacity:.6">
+            </div>
+            <div class="form-group">
+              <label class="form-label">ISSN (Online)</label>
+              <input class="form-input" id="settingISSN" placeholder="XXXX-XXXX">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Editor-in-Chief Email</label>
+              <input class="form-input" id="settingEditorEmail" type="email" placeholder="XXXXX">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Submissions Email</label>
+              <input class="form-input" id="settingSubmissionsEmail" type="email" placeholder="XXXXX">
+            </div>
+            <button class="btn btn-primary" onclick="saveJournalSettings()">Save Settings</button>
+          </div>
+        </div>
+      </div>
+      <div class="admin-panel" style="margin-top:24px">
+        <div class="panel-header"><div class="panel-title" style="color:var(--danger)">⚠️ Danger Zone</div></div>
+        <div class="panel-body">
+          <p style="font-size:var(--fs-sm);color:var(--text-secondary);margin-bottom:16px">These actions are irreversible. Proceed with extreme caution.</p>
+          <button class="btn btn-sm" style="background:var(--danger);color:#fff;border:none" onclick="if(confirm('Sign out of all sessions?')) handleSignOut()">Sign Out All Sessions</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /admin-content -->
+</div><!-- /admin-main -->
+
+<!-- ═══════════════════════════════════════
+     MODALS
+══════════════════════════════════════════ -->
+
+<!-- Article Modal -->
+<div class="modal-overlay" id="articleModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="articleModalTitle">Add Article</div>
+      <button class="modal-close" onclick="closeModal('articleModal')">✕</button>
+    </div>
+    <form id="articleForm" novalidate>
+      <input type="hidden" id="articleId">
+      <div class="form-group">
+        <label class="form-label">Title *</label>
+        <input class="form-input" id="artTitle" placeholder="Full article title" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Authors * <span style="font-size:var(--fs-xs);color:var(--text-muted)">(comma-separated)</span></label>
+        <input class="form-input" id="artAuthors" placeholder="e.g. Prof. T. J. Ayoola, Dr. I. S. Akinnadewo">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-select" id="artCategory">
+            <option>Management Sciences</option>
+            <option>Social Sciences</option>
+            <option>Economics</option>
+            <option>Public Administration</option>
+            <option>Entrepreneurship</option>
+            <option>Human Resources</option>
+            <option>Development Studies</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Journal Issue</label>
+          <select class="form-select" id="artIssue">
+            <option value="">Select issue…</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Abstract *</label>
+        <textarea class="form-textarea" id="artAbstract" placeholder="150–250 word abstract…" style="min-height:100px"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Keywords <span style="font-size:var(--fs-xs);color:var(--text-muted)">(comma-separated)</span></label>
+        <input class="form-input" id="artKeywords" placeholder="governance, finance, Nigeria">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Full Article Content (HTML/Markdown)</label>
+        <textarea class="form-textarea" id="artContent" style="min-height:120px;font-family:'JetBrains Mono',monospace;font-size:13px" placeholder="<p>Introduction...</p>"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Upload PDF</label>
+        <div class="upload-zone" id="pdfZone" onclick="document.getElementById('pdfFile').click()">
+          <div class="upload-zone-icon">📄</div>
+          <div class="upload-zone-title">Click to upload PDF</div>
+          <div class="upload-zone-sub">Accepted: .pdf · Max 20MB</div>
+          <div class="progress-bar" style="display:none" id="pdfProgress"><div class="progress-fill" id="pdfFill" style="width:0%"></div></div>
+          <div id="pdfFileName" style="margin-top:8px;font-size:var(--fs-xs);color:var(--green)"></div>
+        </div>
+        <input type="file" id="pdfFile" accept=".pdf" style="display:none" onchange="handlePdfUpload(this)">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group">
+          <label class="form-label">DOI (optional)</label>
+          <input class="form-input" id="artDOI" placeholder="10.xxxxx/xxxxxx">
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <input type="checkbox" id="artFeatured" style="accent-color:var(--royal)"> Mark as Featured
+          </label>
+          <label class="form-label" style="display:flex;align-items:center;gap:8px">
+            <input type="checkbox" id="artPublished" style="accent-color:var(--royal)" checked> Published
+          </label>
+        </div>
+      </div>
+      <div id="articleFormAlert"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+        <button type="button" class="btn btn-outline" onclick="closeModal('articleModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="articleSubmitBtn">Save Article</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Issue Modal -->
+<div class="modal-overlay" id="issueModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="issueModalTitle">New Issue</div>
+      <button class="modal-close" onclick="closeModal('issueModal')">✕</button>
+    </div>
+    <form id="issueForm" novalidate>
+      <input type="hidden" id="issueId">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group">
+          <label class="form-label">Volume *</label>
+          <input class="form-input" id="issVol" type="number" min="1" value="1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Issue Number *</label>
+          <input class="form-input" id="issNum" type="number" min="1" value="1">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Issue Title</label>
+        <input class="form-input" id="issTitle" placeholder="e.g. Inaugural Edition — July 2026">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Published Date</label>
+        <input class="form-input" id="issDate" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-textarea" id="issDesc" placeholder="Brief description of this issue's theme…"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Upload Cover Image</label>
+        <div class="upload-zone" onclick="document.getElementById('coverFile').click()">
+          <div class="upload-zone-icon">🖼️</div>
+          <div class="upload-zone-title">Upload Cover Image</div>
+          <div class="upload-zone-sub">JPG, PNG · Max 5MB</div>
+          <div id="coverFileName" style="margin-top:8px;font-size:var(--fs-xs);color:var(--green)"></div>
+        </div>
+        <input type="file" id="coverFile" accept="image/*" style="display:none" onchange="handleCoverUpload(this)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Upload Full Issue PDF</label>
+        <div class="upload-zone" onclick="document.getElementById('issuePdfFile').click()">
+          <div class="upload-zone-icon">📄</div>
+          <div class="upload-zone-title">Upload Issue PDF</div>
+          <div class="upload-zone-sub">PDF · Max 100MB</div>
+          <div id="issuePdfFileName" style="margin-top:8px;font-size:var(--fs-xs);color:var(--green)"></div>
+        </div>
+        <input type="file" id="issuePdfFile" accept=".pdf" style="display:none" onchange="handleIssuePdfUpload(this)">
+      </div>
+      <div class="form-group">
+        <label class="form-label" style="display:flex;align-items:center;gap:8px">
+          <input type="checkbox" id="issPublished" style="accent-color:var(--royal)" checked> Mark as Published
+        </label>
+      </div>
+      <div id="issueFormAlert"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+        <button type="button" class="btn btn-outline" onclick="closeModal('issueModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="issueSubmitBtn">Save Issue</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Announcement Modal -->
+<div class="modal-overlay" id="announcementModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="annModalTitle">New Announcement</div>
+      <button class="modal-close" onclick="closeModal('announcementModal')">✕</button>
+    </div>
+    <form id="annForm" novalidate>
+      <input type="hidden" id="annId">
+      <div class="form-group">
+        <label class="form-label">Title *</label>
+        <input class="form-input" id="annTitle" placeholder="Announcement title" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <select class="form-select" id="annType">
+          <option value="call-for-papers">Call for Papers</option>
+          <option value="news">News</option>
+          <option value="event">Event</option>
+          <option value="deadline">Deadline</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Body</label>
+        <textarea class="form-textarea" id="annBody" placeholder="Announcement content…"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Link (optional)</label>
+        <input class="form-input" id="annLink" type="url" placeholder="https://…">
+      </div>
+      <div class="form-group">
+        <label class="form-label" style="display:flex;align-items:center;gap:8px">
+          <input type="checkbox" id="annActive" style="accent-color:var(--royal)" checked> Active (visible on website)
+        </label>
+      </div>
+      <div id="annFormAlert"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+        <button type="button" class="btn btn-outline" onclick="closeModal('announcementModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="annSubmitBtn">Save Announcement</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Board Member Modal -->
+<div class="modal-overlay" id="boardModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="boardModalTitle">Add Board Member</div>
+      <button class="modal-close" onclick="closeModal('boardModal')">✕</button>
+    </div>
+    <form id="boardForm" novalidate>
+      <input type="hidden" id="boardMemberId">
+      <div class="form-group">
+        <label class="form-label">Full Name *</label>
+        <input class="form-input" id="boardName" placeholder="Prof. / Dr. Full Name" required>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group">
+          <label class="form-label">Role *</label>
+          <select class="form-select" id="boardRole">
+            <option value="editor-in-chief">Editor-in-Chief</option>
+            <option value="managing-editor">Managing Editor</option>
+            <option value="board-member">Board Member</option>
+            <option value="advisory">Advisory Board</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sort Order</label>
+          <input class="form-input" id="boardSort" type="number" min="1" value="99">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Specialization</label>
+        <input class="form-input" id="boardSpec" placeholder="e.g. Corporate Governance & Finance">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Institution</label>
+        <input class="form-input" id="boardInst" placeholder="e.g. University of Ilesa, Ilesa, Osun State, Nigeria">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" id="boardEmail" type="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Biography</label>
+        <textarea class="form-textarea" id="boardBio" style="min-height:80px" placeholder="Short academic bio…"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Photo</label>
+        <div class="upload-zone" onclick="document.getElementById('boardPhoto').click()" style="padding:20px">
+          <div class="upload-zone-title" style="font-size:var(--fs-sm)">Upload Photo</div>
+          <div class="upload-zone-sub">JPG, PNG · Square preferred</div>
+          <div id="boardPhotoName" style="font-size:var(--fs-xs);color:var(--green);margin-top:6px"></div>
+        </div>
+        <input type="file" id="boardPhoto" accept="image/*" style="display:none" onchange="handleBoardPhoto(this)">
+      </div>
+      <div class="form-group">
+        <label class="form-label" style="display:flex;align-items:center;gap:8px">
+          <input type="checkbox" id="boardActive" style="accent-color:var(--royal)" checked> Active
+        </label>
+      </div>
+      <div id="boardFormAlert"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+        <button type="button" class="btn btn-outline" onclick="closeModal('boardModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="boardSubmitBtn">Save Member</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="../assets/js/supabase.js"></script>
+<script>
+/* ─── State ─────────────────────────────────────────────── */
+let adminArticles = [];
+let adminIssues   = [];
+let adminUser     = null;
+let uploadedPdfPath     = null;
+let uploadedCoverPath   = null;
+let uploadedIssuePdf    = null;
+let uploadedBoardPhoto  = null;
+
+/* ─── Init ──────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', async () => {
+  initAdminTheme();
+
+  // Auth guard
+  try {
+    const session = await getSession();
+    if (!session) { location.href = 'login.html'; return; }
+    adminUser = session.user;
+    document.getElementById('userEmail').textContent = adminUser.email || 'Admin';
+    document.getElementById('userAvatar').textContent = (adminUser.email || 'A')[0].toUpperCase();
+    document.getElementById('settingEmail').value = adminUser.email || '';
+  } catch(e) {
+    location.href = 'login.html'; return;
+  }
+
+  await Promise.all([ loadDashboard(), loadArticlesList(), loadIssuesList(), loadAnnouncementsList(), loadBoardList() ]);
+  await loadCommentsMod();
+});
+
+/* ─── Theme ─────────────────────────────────────────────── */
+function initAdminTheme() {
+  const t = localStorage.getItem('ujsms-theme') || 'light';
+  document.documentElement.setAttribute('data-theme', t);
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.textContent = t === 'dark' ? '☀️' : '🌙';
+}
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('ujsms-theme', next);
+  document.getElementById('themeToggle').textContent = next === 'dark' ? '☀️' : '🌙';
+}
+
+/* ─── Sidebar ───────────────────────────────────────────── */
+function showSection(name) {
+  document.querySelectorAll('[id^="section-"]').forEach(s => s.style.display = 'none');
+  document.getElementById(`section-${name}`).style.display = 'block';
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  document.querySelector(`[data-section="${name}"]`)?.classList.add('active');
+  const titles = { dashboard:'Dashboard', articles:'Articles', issues:'Journal Issues', announcements:'Announcements', comments:'Comment Moderation', board:'Editorial Board', settings:'Settings' };
+  document.getElementById('topbarTitle').textContent = titles[name] || name;
+  closeSidebar();
+}
+
+function toggleSidebar() {
+  document.getElementById('adminSidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('adminSidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+/* ─── Modals ────────────────────────────────────────────── */
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+// Close on backdrop click
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+// ESC key
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open')); });
+
+/* ─── Dashboard ─────────────────────────────────────────── */
+async function loadDashboard() {
+  try {
+    const [arts, issues, anns] = await Promise.all([
+      db.from('articles').select('*', { count:'exact', head:true }),
+      db.from('issues').select('*', { count:'exact', head:true }).eq('published', true),
+      db.from('announcements').select('*', { count:'exact', head:true }).eq('active', true),
+    ]);
+    const pending = await db.from('comments').select('*', { count:'exact', head:true }).eq('approved', false);
+
+    document.getElementById('statArticles').textContent      = arts.count ?? '—';
+    document.getElementById('statIssues').textContent        = issues.count ?? '—';
+    document.getElementById('statComments').textContent      = pending.count ?? '—';
+    document.getElementById('statAnnouncements').textContent = anns.count ?? '—';
+    document.getElementById('articlesBadge').textContent     = arts.count ?? '—';
+    document.getElementById('commentsBadge').textContent     = pending.count ?? '—';
+    document.getElementById('cPending').textContent          = pending.count ?? '—';
+  } catch(e) {
+    // Supabase not configured; show placeholder
+    ['statArticles','statIssues','statComments','statAnnouncements'].forEach(id => document.getElementById(id).textContent = '—');
+  }
+
+  // Recent articles widget
+  try {
+    const { data } = await db.from('articles').select('id,title,published,created_at').order('created_at',{ascending:false}).limit(5);
+    const el = document.getElementById('dashRecentArticles');
+    el.innerHTML = (data||[]).length ? `<table class="admin-table">${(data||[]).map(a => `
+      <tr>
+        <td style="font-size:var(--fs-sm);font-weight:600;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.title}</td>
+        <td><span class="status-badge ${a.published ? 'status-published' : 'status-draft'}">${a.published ? 'Published' : 'Draft'}</span></td>
+        <td style="font-size:var(--fs-xs);color:var(--text-muted)">${formatDate(a.created_at)}</td>
+      </tr>`).join('')}</table>` : '<div class="empty-state" style="padding:24px"><div class="empty-state-icon">📄</div><div>No articles yet</div></div>';
+  } catch(e) {
+    document.getElementById('dashRecentArticles').innerHTML = '<div class="loading-state" style="padding:20px"><span>Connect Supabase to see data</span></div>';
+  }
+
+  // Pending comments widget
+  try {
+    const { data } = await db.from('comments').select('*').eq('approved',false).order('created_at',{ascending:false}).limit(5);
+    const el = document.getElementById('dashPendingComments');
+    el.innerHTML = (data||[]).length ? (data||[]).map(c => `
+      <div class="comment-mod-row">
+        <div class="comment-mod-body">
+          <div class="comment-mod-meta">${c.author_name} · ${formatDate(c.created_at)}</div>
+          <div class="comment-mod-text">${escapeHtml(c.body||'').slice(0,120)}…</div>
+        </div>
+        <div class="comment-mod-actions">
+          <button class="btn btn-green btn-sm" onclick="approveComment('${c.id}',true)">✓</button>
+          <button class="btn btn-sm" style="background:var(--danger);color:#fff;border:none" onclick="deleteComment('${c.id}')">✕</button>
+        </div>
+      </div>`).join('') : '<div class="empty-state" style="padding:24px"><div class="empty-state-icon">✅</div><div>No pending comments</div></div>';
+  } catch(e) {
+    document.getElementById('dashPendingComments').innerHTML = '<div class="loading-state" style="padding:20px"><span>Connect Supabase to see data</span></div>';
+  }
+}
+
+/* ─── Articles ──────────────────────────────────────────── */
+async function loadArticlesList() {
+  try {
+    const { data } = await db.from('articles').select('*, issues(volume,issue_number)').order('created_at',{ascending:false});
+    adminArticles = data || [];
+  } catch(e) { adminArticles = []; }
+  renderArticlesTable(adminArticles);
+}
+
+function renderArticlesTable(articles) {
+  const tbody = document.getElementById('articlesTableBody');
+  if (!articles.length) { tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state" style="padding:32px"><div class="empty-state-icon">📄</div><div>No articles yet. Add your first article.</div></div></td></tr>`; return; }
+  tbody.innerHTML = articles.map(a => {
+    const authors = Array.isArray(a.authors) ? a.authors.join(', ') : a.authors || '';
+    return `<tr>
+      <td style="max-width:280px"><div style="font-weight:600;font-size:var(--fs-sm);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.title}</div></td>
+      <td style="font-size:var(--fs-xs);color:var(--text-secondary)">${truncate(authors,40)}</td>
+      <td><span class="tag tag-blue" style="font-size:10px">${a.category||'—'}</span></td>
+      <td style="font-size:var(--fs-xs);color:var(--text-muted)">${a.issues ? `Vol.${a.issues.volume} #${a.issues.issue_number}` : '—'}</td>
+      <td><span class="status-badge ${a.published ? 'status-published' : 'status-draft'}">${a.published ? '● Published' : '○ Draft'}</span></td>
+      <td style="font-size:var(--fs-xs);color:var(--text-muted)">${formatDate(a.created_at)}</td>
+      <td>
+        <div class="table-actions">
+          <button class="btn btn-outline btn-sm" onclick="editArticle('${a.id}')">Edit</button>
+          <button class="btn btn-sm" style="background:rgba(217,64,64,.1);color:var(--danger);border:1px solid rgba(217,64,64,.2)" onclick="deleteArticle('${a.id}')">Delete</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterAdminArticles() {
+  const q      = document.getElementById('articleSearchAdmin').value.toLowerCase();
+  const status = document.getElementById('articleStatusFilter').value;
+  let filtered = adminArticles;
+  if (q)      filtered = filtered.filter(a => (a.title||'').toLowerCase().includes(q) || (Array.isArray(a.authors)?a.authors.join(' '):a.authors||'').toLowerCase().includes(q));
+  if (status) filtered = filtered.filter(a => String(a.published) === status);
+  renderArticlesTable(filtered);
+}
+
+function resetArticleForm() {
+  document.getElementById('articleId').value = '';
+  document.getElementById('articleModalTitle').textContent = 'Add Article';
+  document.getElementById('articleForm').reset();
+  uploadedPdfPath = null;
+  document.getElementById('pdfFileName').textContent = '';
+  populateIssueDropdown();
+}
+
+async function populateIssueDropdown() {
+  const sel = document.getElementById('artIssue');
+  sel.innerHTML = '<option value="">No issue assigned</option>';
+  try {
+    const issues = adminIssues.length ? adminIssues : (await db.from('issues').select('id,volume,issue_number,title').order('published_date',{ascending:false})).data || [];
+    issues.forEach(i => { const o = document.createElement('option'); o.value = i.id; o.textContent = `Vol. ${i.volume}, Issue ${i.issue_number}${i.title?' — '+i.title:''}`; sel.appendChild(o); });
+  } catch(e) {}
+}
+
+function editArticle(id) {
+  const a = adminArticles.find(x => x.id === id);
+  if (!a) return;
+  document.getElementById('articleId').value = id;
+  document.getElementById('articleModalTitle').textContent = 'Edit Article';
+  document.getElementById('artTitle').value    = a.title || '';
+  document.getElementById('artAuthors').value  = (Array.isArray(a.authors) ? a.authors : [a.authors||'']).join(', ');
+  document.getElementById('artCategory').value = a.category || 'Management Sciences';
+  document.getElementById('artAbstract').value = a.abstract || '';
+  document.getElementById('artKeywords').value = (Array.isArray(a.keywords) ? a.keywords : []).join(', ');
+  document.getElementById('artContent').value  = a.content || '';
+  document.getElementById('artDOI').value      = a.doi || '';
+  document.getElementById('artFeatured').checked  = !!a.featured;
+  document.getElementById('artPublished').checked = !!a.published;
+  populateIssueDropdown().then(() => { document.getElementById('artIssue').value = a.issue_id || ''; });
+  openModal('articleModal');
+}
+
+document.getElementById('articleForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('articleSubmitBtn');
+  const alertEl = document.getElementById('articleFormAlert');
+  const id = document.getElementById('articleId').value;
+  const title = document.getElementById('artTitle').value.trim();
+  if (!title) { showAdminAlert(alertEl, 'Title is required.', 'error'); return; }
+
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  const payload = {
+    title,
+    authors: document.getElementById('artAuthors').value.split(',').map(s => s.trim()).filter(Boolean),
+    category: document.getElementById('artCategory').value,
+    issue_id: document.getElementById('artIssue').value || null,
+    abstract: document.getElementById('artAbstract').value.trim(),
+    keywords: document.getElementById('artKeywords').value.split(',').map(s => s.trim()).filter(Boolean),
+    content:  document.getElementById('artContent').value.trim(),
+    doi:      document.getElementById('artDOI').value.trim() || null,
+    featured: document.getElementById('artFeatured').checked,
+    published:document.getElementById('artPublished').checked,
+    pdf_url:  uploadedPdfPath || (id ? adminArticles.find(a=>a.id===id)?.pdf_url : null),
+  };
+
+  try {
+    if (id) {
+      await db.from('articles').update(payload).eq('id', id);
+    } else {
+      await db.from('articles').insert([payload]);
+    }
+    closeModal('articleModal');
+    await loadArticlesList();
+    showAdminAlert(document.getElementById('globalAlert'), `Article ${id ? 'updated' : 'created'} successfully.`, 'success');
+  } catch(err) {
+    showAdminAlert(alertEl, 'Error: ' + err.message, 'error');
+  }
+  btn.disabled = false; btn.textContent = 'Save Article';
+});
+
+async function deleteArticle(id) {
+  if (!confirm('Delete this article? This cannot be undone.')) return;
+  try {
+    await db.from('articles').delete().eq('id', id);
+    await loadArticlesList();
+    showAdminAlert(document.getElementById('globalAlert'), 'Article deleted.', 'success');
+  } catch(e) { alert('Error deleting: ' + e.message); }
+}
+
+/* ─── File Uploads ──────────────────────────────────────── */
+async function handlePdfUpload(input) {
+  const file = input.files[0]; if (!file) return;
+  document.getElementById('pdfFileName').textContent = `Uploading ${file.name}…`;
+  document.getElementById('pdfProgress').style.display = 'block';
+  try {
+    const path = `articles/${Date.now()}_${file.name.replace(/\s/g,'_')}`;
+    const { error } = await db.storage.from('pdfs').upload(path, file, { upsert: true });
+    if (error) throw error;
+    uploadedPdfPath = path;
+    document.getElementById('pdfFileName').textContent = `✅ ${file.name}`;
+    document.getElementById('pdfFill').style.width = '100%';
+  } catch(e) { document.getElementById('pdfFileName').textContent = '❌ Upload failed: ' + e.message; }
+}
+
+async function handleCoverUpload(input) {
+  const file = input.files[0]; if (!file) return;
+  document.getElementById('coverFileName').textContent = `Uploading…`;
+  try {
+    const path = `covers/${Date.now()}_${file.name.replace(/\s/g,'_')}`;
+    const { error } = await db.storage.from('covers').upload(path, file, { upsert: true });
+    if (error) throw error;
+    uploadedCoverPath = path;
+    document.getElementById('coverFileName').textContent = `✅ ${file.name}`;
+  } catch(e) { document.getElementById('coverFileName').textContent = '❌ ' + e.message; }
+}
+
+async function handleIssuePdfUpload(input) {
+  const file = input.files[0]; if (!file) return;
+  document.getElementById('issuePdfFileName').textContent = 'Uploading…';
+  try {
+    const path = `issues/${Date.now()}_${file.name.replace(/\s/g,'_')}`;
+    const { error } = await db.storage.from('issues').upload(path, file, { upsert: true });
+    if (error) throw error;
+    uploadedIssuePdf = path;
+    document.getElementById('issuePdfFileName').textContent = `✅ ${file.name}`;
+  } catch(e) { document.getElementById('issuePdfFileName').textContent = '❌ ' + e.message; }
+}
+
+async function handleBoardPhoto(input) {
+  const file = input.files[0]; if (!file) return;
+  document.getElementById('boardPhotoName').textContent = 'Uploading…';
+  try {
+    const path = `avatars/${Date.now()}_${file.name.replace(/\s/g,'_')}`;
+    const { error } = await db.storage.from('avatars').upload(path, file, { upsert: true });
+    if (error) throw error;
+    uploadedBoardPhoto = path;
+    document.getElementById('boardPhotoName').textContent = `✅ ${file.name}`;
+  } catch(e) { document.getElementById('boardPhotoName').textContent = '❌ ' + e.message; }
+}
+
+/* ─── Issues ────────────────────────────────────────────── */
+async function loadIssuesList() {
+  try {
+    const { data } = await db.from('issues').select('*').order('published_date',{ascending:false});
+    adminIssues = data || [];
+  } catch(e) { adminIssues = []; }
+  renderIssuesTable(adminIssues);
+}
+
+function renderIssuesTable(issues) {
+  const tbody = document.getElementById('issuesTableBody');
+  if (!issues.length) { tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state" style="padding:32px"><div class="empty-state-icon">📚</div><div>No issues yet.</div></div></td></tr>`; return; }
+  tbody.innerHTML = issues.map(i => `<tr>
+    <td style="font-weight:700">Vol. ${i.volume}</td>
+    <td>Issue ${i.issue_number}</td>
+    <td style="font-size:var(--fs-sm)">${i.title || '—'}</td>
+    <td style="font-size:var(--fs-xs);color:var(--text-muted)">${formatDate(i.published_date)}</td>
+    <td>${i.article_count || '—'}</td>
+    <td><span class="status-badge ${i.published ? 'status-published' : 'status-draft'}">${i.published ? '● Published' : '○ Draft'}</span></td>
+    <td><div class="table-actions">
+      <button class="btn btn-outline btn-sm" onclick="editIssue('${i.id}')">Edit</button>
+      <button class="btn btn-sm" style="background:rgba(217,64,64,.1);color:var(--danger);border:1px solid rgba(217,64,64,.2)" onclick="deleteIssue('${i.id}')">Delete</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function resetIssueForm() {
+  document.getElementById('issueId').value = '';
+  document.getElementById('issueModalTitle').textContent = 'New Issue';
+  document.getElementById('issueForm').reset();
+  uploadedCoverPath = null; uploadedIssuePdf = null;
+  document.getElementById('coverFileName').textContent = '';
+  document.getElementById('issuePdfFileName').textContent = '';
+}
+
+function editIssue(id) {
+  const i = adminIssues.find(x => x.id === id);
+  if (!i) return;
+  document.getElementById('issueId').value   = id;
+  document.getElementById('issueModalTitle').textContent = 'Edit Issue';
+  document.getElementById('issVol').value    = i.volume;
+  document.getElementById('issNum').value    = i.issue_number;
+  document.getElementById('issTitle').value  = i.title || '';
+  document.getElementById('issDate').value   = i.published_date?.split('T')[0] || '';
+  document.getElementById('issDesc').value   = i.description || '';
+  document.getElementById('issPublished').checked = !!i.published;
+  openModal('issueModal');
+}
+
+document.getElementById('issueForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('issueSubmitBtn');
+  const alertEl = document.getElementById('issueFormAlert');
+  const id = document.getElementById('issueId').value;
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  const payload = {
+    volume:       parseInt(document.getElementById('issVol').value),
+    issue_number: parseInt(document.getElementById('issNum').value),
+    title:        document.getElementById('issTitle').value.trim(),
+    published_date: document.getElementById('issDate').value || null,
+    description:  document.getElementById('issDesc').value.trim(),
+    published:    document.getElementById('issPublished').checked,
+    cover_url:    uploadedCoverPath  || (id ? adminIssues.find(i=>i.id===id)?.cover_url : null),
+    pdf_url:      uploadedIssuePdf   || (id ? adminIssues.find(i=>i.id===id)?.pdf_url   : null),
+  };
+
+  try {
+    if (id) await db.from('issues').update(payload).eq('id', id);
+    else    await db.from('issues').insert([payload]);
+    closeModal('issueModal');
+    await loadIssuesList();
+    showAdminAlert(document.getElementById('globalAlert'), `Issue ${id ? 'updated' : 'created'}.`, 'success');
+  } catch(err) { showAdminAlert(alertEl, 'Error: ' + err.message, 'error'); }
+  btn.disabled = false; btn.textContent = 'Save Issue';
+});
+
+async function deleteIssue(id) {
+  if (!confirm('Delete this issue?')) return;
+  try { await db.from('issues').delete().eq('id', id); await loadIssuesList(); } catch(e) { alert(e.message); }
+}
+
+/* ─── Announcements ─────────────────────────────────────── */
+async function loadAnnouncementsList() {
+  try {
+    const { data } = await db.from('announcements').select('*').order('created_at',{ascending:false});
+    renderAnnouncementsTable(data || []);
+  } catch(e) { document.getElementById('announcementsTableBody').innerHTML = `<tr><td colspan="5" style="padding:24px;color:var(--text-muted);text-align:center">Connect Supabase to manage announcements.</td></tr>`; }
+}
+
+function renderAnnouncementsTable(items) {
+  const tbody = document.getElementById('announcementsTableBody');
+  if (!items.length) { tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state" style="padding:32px"><div class="empty-state-icon">📢</div><div>No announcements yet.</div></div></td></tr>`; return; }
+  tbody.innerHTML = items.map(i => `<tr>
+    <td style="font-weight:600;font-size:var(--fs-sm)">${i.title}</td>
+    <td><span class="tag tag-blue" style="font-size:10px">${i.type||'news'}</span></td>
+    <td>${i.active ? '✅' : '⛔'}</td>
+    <td style="font-size:var(--fs-xs);color:var(--text-muted)">${formatDate(i.created_at)}</td>
+    <td><div class="table-actions">
+      <button class="btn btn-outline btn-sm" onclick="editAnn('${i.id}')">Edit</button>
+      <button class="btn btn-sm" style="background:rgba(217,64,64,.1);color:var(--danger);border:1px solid rgba(217,64,64,.2)" onclick="deleteAnn('${i.id}')">Delete</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function resetAnnForm() {
+  document.getElementById('annId').value = '';
+  document.getElementById('annModalTitle').textContent = 'New Announcement';
+  document.getElementById('annForm').reset();
+  document.getElementById('annActive').checked = true;
+}
+
+function editAnn(id) {
+  // Refetch from live data
+  db.from('announcements').select('*').eq('id',id).single().then(({data:i}) => {
+    if (!i) return;
+    document.getElementById('annId').value    = id;
+    document.getElementById('annModalTitle').textContent = 'Edit Announcement';
+    document.getElementById('annTitle').value = i.title||'';
+    document.getElementById('annType').value  = i.type||'news';
+    document.getElementById('annBody').value  = i.body||'';
+    document.getElementById('annLink').value  = i.link||'';
+    document.getElementById('annActive').checked = !!i.active;
+    openModal('announcementModal');
+  });
+}
+
+document.getElementById('annForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('annSubmitBtn');
+  const alertEl = document.getElementById('annFormAlert');
+  const id = document.getElementById('annId').value;
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  const payload = {
+    title:  document.getElementById('annTitle').value.trim(),
+    type:   document.getElementById('annType').value,
+    body:   document.getElementById('annBody').value.trim(),
+    link:   document.getElementById('annLink').value.trim() || null,
+    active: document.getElementById('annActive').checked,
+  };
+
+  try {
+    if (id) await db.from('announcements').update(payload).eq('id', id);
+    else    await db.from('announcements').insert([payload]);
+    closeModal('announcementModal');
+    await loadAnnouncementsList();
+    showAdminAlert(document.getElementById('globalAlert'), `Announcement ${id?'updated':'created'}.`, 'success');
+  } catch(err) { showAdminAlert(alertEl, 'Error: ' + err.message, 'error'); }
+  btn.disabled = false; btn.textContent = 'Save Announcement';
+});
+
+async function deleteAnn(id) {
+  if (!confirm('Delete this announcement?')) return;
+  try { await db.from('announcements').delete().eq('id', id); await loadAnnouncementsList(); } catch(e) { alert(e.message); }
+}
+
+/* ─── Comments Moderation ───────────────────────────────── */
+async function loadCommentsMod() {
+  const filter = document.getElementById('commentFilter')?.value || 'pending';
+  const container = document.getElementById('commentsModList');
+  container.innerHTML = '<div class="loading-state"><div class="loader"></div></div>';
+  try {
+    let query = db.from('comments').select('*').order('created_at',{ascending:false}).limit(50);
+    if (filter === 'pending')  query = query.eq('approved', false);
+    if (filter === 'approved') query = query.eq('approved', true);
+    const { data } = await query;
+    const items = data || [];
+
+    // Update stats
+    const [pen, app, pin] = await Promise.all([
+      db.from('comments').select('*',{count:'exact',head:true}).eq('approved',false),
+      db.from('comments').select('*',{count:'exact',head:true}).eq('approved',true),
+      db.from('comments').select('*',{count:'exact',head:true}).eq('pinned',true),
+    ]);
+    document.getElementById('cPending').textContent  = pen.count ?? '—';
+    document.getElementById('cApproved').textContent = app.count ?? '—';
+    document.getElementById('cPinned').textContent   = pin.count ?? '—';
+
+    if (!items.length) { container.innerHTML = '<div class="empty-state" style="padding:32px"><div class="empty-state-icon">💬</div><div>No comments in this category.</div></div>'; return; }
+    container.innerHTML = items.map(c => `
+      <div class="comment-mod-row" id="cmr-${c.id}">
+        <div class="comment-avatar" style="background:linear-gradient(135deg,var(--royal),var(--navy));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:var(--fs-sm);width:40px;height:40px;border-radius:50%;flex-shrink:0">
+          ${(c.author_name||'?')[0].toUpperCase()}
+        </div>
+        <div class="comment-mod-body">
+          <div class="comment-mod-meta">
+            <strong>${escapeHtml(c.author_name||'Anonymous')}</strong> · ${formatDate(c.created_at)}
+            ${c.pinned ? '<span class="pinned-badge">📌 Pinned</span>' : ''}
+            ${c.approved ? '<span class="status-badge status-published" style="font-size:10px">Approved</span>' : '<span class="status-badge status-draft" style="font-size:10px">Pending</span>'}
+          </div>
+          <div class="comment-mod-text">${escapeHtml(c.body||'')}</div>
+          <div style="font-size:var(--fs-xs);color:var(--text-muted);margin-top:4px">
+            Article/Issue: ${c.target_id || '—'} · Likes: ${c.likes||0}
+          </div>
+        </div>
+        <div class="comment-mod-actions">
+          ${!c.approved ? `<button class="btn btn-green btn-sm" onclick="approveComment('${c.id}',true)">✓ Approve</button>` : `<button class="btn btn-outline btn-sm" onclick="approveComment('${c.id}',false)">Unapprove</button>`}
+          <button class="btn btn-outline btn-sm" onclick="pinComment('${c.id}',${!c.pinned})">${c.pinned ? '📌 Unpin' : '📌 Pin'}</button>
+          <button class="btn btn-sm" style="background:rgba(217,64,64,.1);color:var(--danger);border:1px solid rgba(217,64,64,.2)" onclick="deleteComment('${c.id}')">Delete</button>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    container.innerHTML = '<div class="loading-state" style="padding:32px"><span>Connect Supabase to moderate comments.</span></div>';
+  }
+}
+
+async function approveComment(id, approved) {
+  try {
+    await db.from('comments').update({ approved }).eq('id', id);
+    document.getElementById(`cmr-${id}`)?.remove();
+    await loadCommentsMod();
+  } catch(e) { alert(e.message); }
+}
+
+async function pinComment(id, pinned) {
+  try { await db.from('comments').update({ pinned }).eq('id', id); await loadCommentsMod(); } catch(e) { alert(e.message); }
+}
+
+async function deleteComment(id) {
+  if (!confirm('Delete this comment?')) return;
+  try { await db.from('comments').delete().eq('id', id); document.getElementById(`cmr-${id}`)?.remove(); await loadDashboard(); } catch(e) { alert(e.message); }
+}
+
+/* ─── Editorial Board ───────────────────────────────────── */
+async function loadBoardList() {
+  try {
+    const { data } = await db.from('editorial_board').select('*').order('sort_order',{ascending:true});
+    renderBoardTable(data || []);
+  } catch(e) { document.getElementById('boardTableBody').innerHTML = `<tr><td colspan="7" style="padding:24px;color:var(--text-muted);text-align:center">Connect Supabase to manage editorial board.</td></tr>`; }
+}
+
+function renderBoardTable(members) {
+  const tbody = document.getElementById('boardTableBody');
+  if (!members.length) { tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state" style="padding:32px"><div class="empty-state-icon">👥</div><div>No board members yet.</div></div></td></tr>`; return; }
+  tbody.innerHTML = members.map(m => `<tr>
+    <td style="font-weight:600;font-size:var(--fs-sm)">${m.name}</td>
+    <td><span class="tag tag-navy" style="font-size:10px">${m.role}</span></td>
+    <td style="font-size:var(--fs-xs)">${m.specialization||'—'}</td>
+    <td style="font-size:var(--fs-xs);color:var(--text-muted)">${m.institution||'—'}</td>
+    <td>${m.active ? '✅' : '⛔'}</td>
+    <td style="font-size:var(--fs-xs)">${m.sort_order||'—'}</td>
+    <td><div class="table-actions">
+      <button class="btn btn-outline btn-sm" onclick="editBoardMember('${m.id}')">Edit</button>
+      <button class="btn btn-sm" style="background:rgba(217,64,64,.1);color:var(--danger);border:1px solid rgba(217,64,64,.2)" onclick="deleteBoardMember('${m.id}')">Delete</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function resetBoardForm() {
+  document.getElementById('boardMemberId').value = '';
+  document.getElementById('boardModalTitle').textContent = 'Add Board Member';
+  document.getElementById('boardForm').reset();
+  uploadedBoardPhoto = null;
+  document.getElementById('boardPhotoName').textContent = '';
+  document.getElementById('boardActive').checked = true;
+}
+
+function editBoardMember(id) {
+  db.from('editorial_board').select('*').eq('id',id).single().then(({data:m}) => {
+    if (!m) return;
+    document.getElementById('boardMemberId').value = id;
+    document.getElementById('boardModalTitle').textContent = 'Edit Member';
+    document.getElementById('boardName').value  = m.name||'';
+    document.getElementById('boardRole').value  = m.role||'board-member';
+    document.getElementById('boardSort').value  = m.sort_order||99;
+    document.getElementById('boardSpec').value  = m.specialization||'';
+    document.getElementById('boardInst').value  = m.institution||'';
+    document.getElementById('boardEmail').value = m.email||'';
+    document.getElementById('boardBio').value   = m.bio||'';
+    document.getElementById('boardActive').checked = !!m.active;
+    openModal('boardModal');
+  });
+}
+
+document.getElementById('boardForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('boardSubmitBtn');
+  const alertEl = document.getElementById('boardFormAlert');
+  const id = document.getElementById('boardMemberId').value;
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  const payload = {
+    name:          document.getElementById('boardName').value.trim(),
+    role:          document.getElementById('boardRole').value,
+    sort_order:    parseInt(document.getElementById('boardSort').value) || 99,
+    specialization:document.getElementById('boardSpec').value.trim(),
+    institution:   document.getElementById('boardInst').value.trim(),
+    email:         document.getElementById('boardEmail').value.trim() || null,
+    bio:           document.getElementById('boardBio').value.trim(),
+    active:        document.getElementById('boardActive').checked,
+    photo_url:     uploadedBoardPhoto || null,
+  };
+
+  try {
+    if (id) await db.from('editorial_board').update(payload).eq('id', id);
+    else    await db.from('editorial_board').insert([payload]);
+    closeModal('boardModal');
+    await loadBoardList();
+    showAdminAlert(document.getElementById('globalAlert'), `Board member ${id?'updated':'added'}.`, 'success');
+  } catch(err) { showAdminAlert(alertEl, 'Error: ' + err.message, 'error'); }
+  btn.disabled = false; btn.textContent = 'Save Member';
+});
+
+async function deleteBoardMember(id) {
+  if (!confirm('Remove this board member?')) return;
+  try { await db.from('editorial_board').delete().eq('id', id); await loadBoardList(); } catch(e) { alert(e.message); }
+}
+
+/* ─── Settings ──────────────────────────────────────────── */
+async function saveAccountSettings() {
+  const name = document.getElementById('settingName').value.trim();
+  const pwd  = document.getElementById('settingPassword').value;
+  try {
+    const updates = {};
+    if (name) updates.data = { display_name: name };
+    if (pwd)  updates.password = pwd;
+    if (Object.keys(updates).length) await db.auth.updateUser(updates);
+    showAdminAlert(document.getElementById('globalAlert'), 'Account settings saved.', 'success');
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function saveJournalSettings() {
+  showAdminAlert(document.getElementById('globalAlert'), 'Journal settings saved (requires custom settings table in Supabase to persist).', 'info');
+}
+
+/* ─── Auth ──────────────────────────────────────────────── */
+async function handleSignOut() {
+  await signOut();
+  location.href = 'login.html';
+}
+
+/* ─── Helpers ───────────────────────────────────────────── */
+function showAdminAlert(container, msg, type) {
+  if (!container) return;
+  container.innerHTML = `<div class="alert alert-${type}" style="margin-bottom:16px">${msg}</div>`;
+  setTimeout(() => { if (container) container.innerHTML = ''; }, 6000);
+}
+
+function escapeHtml(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
