@@ -411,7 +411,7 @@ function getFooterHTML() {
         <div class="footer-heading">Contact</div>
         <div class="footer-contact-item">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
-          editor@ujsms.com
+          xxxxxx@xxxx.com
         </div>
         <div class="footer-contact-item">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13 19.79 19.79 0 0 1 1.61 4.4 2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91"/></svg>
@@ -419,7 +419,7 @@ function getFooterHTML() {
         </div>
         <div class="footer-contact-item">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          University of Lagos, Lagos State, Nigeria
+          University of Ilesa, Ilesa, Osun State, Nigeria
         </div>
         <div style="margin-top:16px">
           <div class="label" style="color:rgba(255,255,255,.4);margin-bottom:8px">ISSN (Online)</div>
@@ -427,7 +427,7 @@ function getFooterHTML() {
         </div>
         <div style="margin-top:12px">
           <div class="label" style="color:rgba(255,255,255,.4);margin-bottom:8px">Website</div>
-          <a href="https://www.ujsms.com" style="color:var(--light-blue);font-size:var(--fs-sm)">www.ujsms.com</a>
+          <a href="https://www.unilesa.edu.ng" style="color:var(--light-blue);font-size:var(--fs-sm)">www.unilesa.com</a>
         </div>
       </div>
     </div>
