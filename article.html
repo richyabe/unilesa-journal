@@ -192,7 +192,7 @@ function renderArticle(a) {
     <div style="display:flex;flex-direction:column;gap:10px">
       <div><div style="font-size:var(--fs-xs);color:var(--text-muted);margin-bottom:2px">Published</div><strong>${date}</strong></div>
       <div><div style="font-size:var(--fs-xs);color:var(--text-muted);margin-bottom:2px">Category</div><strong>${a.category || '—'}</strong></div>
-      <div><div style="font-size:var(--fs-xs);color:var(--text-muted);margin-bottom:2px">Volume</div><strong>Vol. ${a.issues?.volume || 1}, Issue ${a.issues?.issue_number || 1}</strong></div>
+      <div><div style="font-size:var(--fs-xs);color:var(--text-muted);margin-bottom:2px">Volume</div><strong>Vol. ${a.issues?.volume || 1}, Issue ${a.issues?.issue_number || 0}</strong></div>
       <div><div style="font-size:var(--fs-xs);color:var(--text-muted);margin-bottom:2px">License</div><strong>CC-BY 4.0</strong></div>
     </div>`;
 
@@ -205,7 +205,7 @@ function renderArticle(a) {
   }).join(', & ');
   const year = new Date(a.created_at || Date.now()).getFullYear();
   document.getElementById('citeBox').textContent =
-    `${authorsApa} (${year}). ${a.title}. UNILESA Journal of Social and Management Sciences, ${a.issues?.volume || 1}(${a.issues?.issue_number || 1}). https://www.ujsms.com/article?id=${a.id}`;
+    `${authorsApa} (${year}). ${a.title}. UNILESA Journal of Social and Management Sciences, ${a.issues?.volume || 1}(${a.issues?.issue_number || 0}). https://www.ujsms.com/article?id=${a.id}`;
 
   // Article body
   document.getElementById('articleBody').innerHTML = `
@@ -224,7 +224,7 @@ function renderArticle(a) {
     <div class="article-meta-strip">
       <div class="article-meta-item">📅 <span>${date}</span></div>
       <div class="article-meta-item">📂 <span>${a.category || 'Article'}</span></div>
-      <div class="article-meta-item">📖 <span>Vol. ${a.issues?.volume || 1}, Issue ${a.issues?.issue_number || 1}</span></div>
+      <div class="article-meta-item">📖 <span>Vol. ${a.issues?.volume || 1}, Issue ${a.issues?.issue_number || 0}</span></div>
       ${a.doi ? `<div class="article-meta-item">🔗 DOI: <a href="https://doi.org/${a.doi}" target="_blank">${a.doi}</a></div>` : ''}
     </div>
 
