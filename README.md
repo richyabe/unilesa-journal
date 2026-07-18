@@ -222,6 +222,8 @@ Update the `<select>` in `admin/dashboard.html` (Article Modal → Category drop
 Edit the `getFooterHTML()` function in `assets/js/components.js`.
 
 ---
+### supabase storage password
+7njqSeskJoOYsywm
 
 ## 📞 Support
 
