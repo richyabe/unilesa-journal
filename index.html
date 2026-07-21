@@ -332,21 +332,14 @@ function renderIssueCard(issue) {
 // Fallback content when Supabase is not configured yet
 function getFallbackArticles(count = 3) {
   const samples = [
-    { id:'1', title:'Corporate Governance and Financial Performance in Nigerian Banking Sector', authors:['Dr. Adewale Okafor','Prof. Ngozi Eze'], abstract:'This study examines the relationship between corporate governance mechanisms and the financial performance of deposit money banks in Nigeria, employing a panel data approach spanning 2015–2024.', category:'Management Sciences', created_at: new Date().toISOString(), featured: true },
-    { id:'2', title:'Social Capital and Community Development in Urban Lagos', authors:['Dr. Chioma Nwosu'], abstract:'An empirical investigation into how social capital formation affects community-driven development initiatives in low-income urban settlements in Lagos State, Nigeria.', category:'Social Sciences', created_at: new Date().toISOString(), featured: true },
-    { id:'3', title:'Entrepreneurial Orientation and SME Growth in Sub-Saharan Africa', authors:['Prof. Emeka Obi','Dr. Fatima Aliyu'], abstract:'This paper explores how entrepreneurial orientation dimensions — innovativeness, risk-taking, and proactiveness — predict the growth trajectories of small and medium enterprises in Sub-Saharan Africa.', category:'Entrepreneurship', created_at: new Date().toISOString(), featured: true },
-    { id:'4', title:'Digital Transformation in Public Sector Management', authors:['Dr. Kemi Adebayo'], abstract:'A systematic review of digital transformation initiatives in Nigeria\'s public sector, examining implementation challenges, success factors, and implications for service delivery.', category:'Public Administration', created_at: new Date().toISOString() },
-    { id:'5', title:'Microfinance and Poverty Alleviation: Evidence from Rural Nigeria', authors:['Dr. Aminu Bello','Prof. Grace Adesanya'], abstract:'This study evaluates the effectiveness of microfinance institution interventions on poverty alleviation among rural households in Northern Nigeria.', category:'Economics', created_at: new Date().toISOString() },
-    { id:'6', title:'Organizational Culture and Employee Retention in Nigerian Universities', authors:['Dr. Taiwo Ogundele'], abstract:'Examining how organizational culture dimensions predict employee retention outcomes in selected Nigerian federal universities, with implications for human resource management.', category:'Human Resources', created_at: new Date().toISOString() },
+    
   ];
   return samples.slice(0, count);
 }
 
 function getFallbackAnnouncements() {
   return [
-    { id:'1', type:'call-for-papers', title:'Call for Papers — Vol. 1, Issue 2', body:'We invite submission of original research articles for the upcoming issue. Deadline: September 30, 2026.', created_at: new Date().toISOString() },
-    { id:'2', type:'news', title:'UJSMS Now Indexed on African Journals Online', body:'We are delighted to announce that UJSMS has been accepted for indexing on AJOL (African Journals OnLine).', created_at: new Date().toISOString() },
-    { id:'3', type:'event', title:'International Conference on Social Sciences 2026', body:'UJSMS is proud to sponsor the upcoming ICSS 2026 conference in Abuja. Submit your extended abstracts by August 15.', created_at: new Date().toISOString() },
+    
   ];
 }
 </script>
